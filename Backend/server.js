@@ -8,13 +8,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const port = 5000;
-const JWT_SECRET = "your-secret-key";
+const JWT_SECRET = "ababababababababababababababab";
 
 const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: ["http://localhost:5173", "http://localhost5000"],
     credentials: true
 }));
 
@@ -31,11 +31,9 @@ app.post('/api/register', async (req, res) => {
             return res.status(400).json({ error: "Email already registered" });
         }
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);      // bcrypt hash
 
-        // Create new user or mentor based on role
-        if (role === 'mentor') {
+        if (role === 'mentor') {                      // role making
             const mentor = new Mentor({
                 email,
                 password: hashedPassword,
@@ -63,7 +61,6 @@ app.post('/api/login', async (req, res) => {
     try {
         const { email, password, role } = req.body;
         
-        // Check the appropriate collection based on role
         const Model = role === 'mentor' ? Mentor : User;
         const user = await Model.findOne({ email });
 
@@ -108,7 +105,6 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Get all mentors
 app.get('/api/mentors', async (req, res) => {
     try {
         const mentors = await Mentor.find({}, '-password');
@@ -119,8 +115,8 @@ app.get('/api/mentors', async (req, res) => {
     }
 });
 
-// Create a connection request
-app.post('/api/requests', async (req, res) => {
+
+app.post('/api/requests', async (req, res) => {                              // create a connection request
     try {
         const { userId, mentorId, userName } = req.body;
         const newRequest = new Request({ userId, mentorId, userName });
@@ -132,8 +128,8 @@ app.post('/api/requests', async (req, res) => {
     }
 });
 
-// Get requests for a mentor
-app.get('/api/requests/:mentorId', async (req, res) => {
+
+app.get('/api/requests/:mentorId', async (req, res) => {                    // get requests for a mentor
     try {
         const requests = await Request.find({ mentorId: req.params.mentorId }).populate('userId', 'name');
         res.json(requests);
@@ -143,7 +139,7 @@ app.get('/api/requests/:mentorId', async (req, res) => {
     }
 });
 
-// Initialize database connection
+
 connectDb().then(() => {
     app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
